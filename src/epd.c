@@ -4,6 +4,7 @@
 #include "epd.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
@@ -17,12 +18,19 @@
 #define PIN_BUSY 13
 #define EPD_SPI spi1
 
-void epd_pixel(epd_image img, int x, int y, bool black) {
-  if (x < 0 || x >= EPD_WIDTH || y < 0 || y >= EPD_HEIGHT)
-    return;
+void epd_pixel_set(epd_image img, int x, int y, bool black) {
+  x = (x + EPD_WIDTH) % EPD_WIDTH;
+  y = (y + EPD_HEIGHT) % EPD_HEIGHT;
   uint8_t *byte = &img[y * EPD_ROW_BYTES + x / 8];
   uint8_t bit = 0x80 >> (x % 8);
   *byte = black ? *byte | bit : *byte & ~bit;
+}
+
+bool epd_pixel_get(epd_image img, int x, int y) {
+  x = (x + EPD_WIDTH) % EPD_WIDTH;
+  y = (y + EPD_HEIGHT) % EPD_HEIGHT;
+  uint8_t bit = 0x80 >> (x % 8);
+  return (img[y * EPD_ROW_BYTES + x / 8] & bit) != 0;
 }
 
 static void send(bool data, uint8_t byte) {
