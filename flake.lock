@@ -16,9 +16,26 @@
         "type": "github"
       }
     },
+    "pico-ota": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792885383,
+        "narHash": "sha256-F4XRmnwL1nHQ6X1zIq3qZSL9MykcJM9rnJkUB6Ub53I=",
+        "owner": "luiswirth",
+        "repo": "pico-ota",
+        "rev": "04ef5e74b14632c061635ea9c558a4bf784cc0c9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "luiswirth",
+        "repo": "pico-ota",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
+        "pico-ota": "pico-ota",
         "treefmt-nix": "treefmt-nix"
       }
     },

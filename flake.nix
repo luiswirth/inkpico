@@ -4,11 +4,16 @@
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # The bootloader and runtime the apps link. Only its source is used.
+    pico-ota.url = "github:luiswirth/pico-ota";
+    pico-ota.flake = false;
   };
 
   outputs = {
     nixpkgs,
     treefmt-nix,
+    pico-ota,
     ...
   }: let
     forEachSystem = f:
@@ -27,12 +32,14 @@
       });
 
     devShells = forEachSystem (pkgs: let
-      # The submodules bring tinyusb (USB serial) and cyw43 (the Pico W's radio, which drives the LED).
+      # The submodules bring tinyusb (USB serial), cyw43 (the radio) and lwIP (the network stack).
       pico-sdk = pkgs.pico-sdk.override {withSubmodules = true;};
     in {
       default = pkgs.mkShell {
-        packages = with pkgs; [cmake ninja gcc-arm-embedded picotool python3 just tio];
+        packages = with pkgs; [cmake ninja gcc-arm-embedded picotool python3 just tio imagemagick];
         PICO_SDK_PATH = "${pico-sdk}/lib/pico-sdk";
+        # Point it at a checkout, such as ../pico-ota, to work on both at once.
+        PICO_OTA_PATH = "${pico-ota}";
       };
     });
   };

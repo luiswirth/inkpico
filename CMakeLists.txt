@@ -8,8 +8,18 @@ include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 project(inkpico C CXX ASM)
 pico_sdk_init()
 
-add_executable(inkpico src/main.c src/epd.c)
-target_link_libraries(inkpico pico_stdlib hardware_spi pico_cyw43_arch_none)
-pico_enable_stdio_usb(inkpico 1)
-pico_enable_stdio_uart(inkpico 0)
-pico_add_extra_outputs(inkpico)
+include($ENV{PICO_OTA_PATH}/pico_ota.cmake)
+
+add_library(epd INTERFACE)
+target_sources(epd INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src/epd.c)
+target_include_directories(epd INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src)
+target_link_libraries(epd INTERFACE pico_stdlib hardware_spi)
+
+# Each app is src/<app>.c, which tools/ota flashes as build/<app>.bin.
+foreach(app image life)
+    add_executable(${app} src/${app}.c)
+    target_link_libraries(${app} epd)
+    pico_enable_stdio_usb(${app} 1)
+    pico_enable_stdio_uart(${app} 0)
+    ota_app(${app})
+endforeach()
