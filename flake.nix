@@ -34,9 +34,16 @@
     devShells = forEachSystem (pkgs: let
       # The submodules bring tinyusb (USB serial), cyw43 (the radio) and lwIP (the network stack).
       pico-sdk = pkgs.pico-sdk.override {withSubmodules = true;};
+      # Renders HTML for tools/show, headless. Chrome rather than Chromium,
+      # since nixpkgs builds Chromium for Linux only.
+      chrome =
+        (import nixpkgs {
+          inherit (pkgs.stdenv.hostPlatform) system;
+          config.allowUnfreePredicate = p: nixpkgs.lib.getName p == "google-chrome";
+        }).google-chrome;
     in {
       default = pkgs.mkShell {
-        packages = with pkgs; [cmake ninja gcc-arm-embedded picotool python3 just tio typst imagemagick];
+        packages = with pkgs; [cmake ninja gcc-arm-embedded picotool python3 just tio typst imagemagick chrome];
         PICO_SDK_PATH = "${pico-sdk}/lib/pico-sdk";
         # Point it at a checkout, such as ../pico-ota, to work on both at once.
         PICO_OTA_PATH = "${pico-ota}";

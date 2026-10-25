@@ -8,7 +8,7 @@ build:
 flash app: build
     "$PICO_OTA_PATH/tools/ota" flash {{ host }} build/{{ app }}.bin
 
-# Shows a Typst document or a picture on the image app; see tools/show.
+# Shows an HTML page, a Typst document or a picture on the image app; see tools/show.
 show file *flags:
     tools/show {{ flags }} {{ quote(file) }} {{ host }}
 
