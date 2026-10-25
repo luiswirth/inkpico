@@ -3,7 +3,6 @@
 
 #include "epd.h"
 #include "net.h"
-#include "pico/cyw43_arch.h"
 #include "pico/stdlib.h"
 
 static epd_image image1;
@@ -82,9 +81,7 @@ static void draw_mandelbrot(void) {
 
 int main(void) {
   stdio_init_all();
-  // The Pico W's LED hangs off the radio chip.
-  net_init(); // also starts the radio
-  cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+  net_init();
   // Give a serial monitor up to 3 s to connect, so the progress lines are seen.
   for (int i = 0; i < 30 && !stdio_usb_connected(); i++)
     sleep_ms(100);

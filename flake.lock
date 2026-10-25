@@ -19,11 +19,11 @@
     "pico-ota": {
       "flake": false,
       "locked": {
-        "lastModified": 1792885383,
-        "narHash": "sha256-F4XRmnwL1nHQ6X1zIq3qZSL9MykcJM9rnJkUB6Ub53I=",
+        "lastModified": 1792889595,
+        "narHash": "sha256-Y8neFiMpwgCWYl/Yr0mJyCRa9/UVxpzcWom4X1yA+Co=",
         "owner": "luiswirth",
         "repo": "pico-ota",
-        "rev": "04ef5e74b14632c061635ea9c558a4bf784cc0c9",
+        "rev": "faabfb47401327f29fca1177d655b2305235819a",
         "type": "github"
       },
       "original": {
