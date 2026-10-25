@@ -1,9 +1,10 @@
 # inkpico
 
 C firmware for a Raspberry Pi Pico W (RP2040) driving a Waveshare 5.83" e-paper V2
-(648x480, black and white), on the Pico SDK.
+(648x480, black and white), as apps on `pico-ota`.
 
-- The Pico is on the Mac's USB, so the work happens there.
-- `src/epd.c` is the display driver, with the pins; `src/main.c` draws.
-- The `justfile` builds, flashes and opens the serial monitor.
-  Flashing needs no BOOTSEL as long as the running program has USB serial.
+- `src/epd.c` is the display driver, with the pins; every other file in `src/` is an app.
+- `src/image.c` is the foundation: it shows a picture sent over HTTP, nothing more.
+  What makes pictures is built on top of it.
+- `pico-ota` is a flake input, as `PICO_OTA_PATH` in the dev shell; pointing it at `../pico-ota` builds against that checkout.
+- The `justfile` builds, flashes an app over Wi-Fi, and shows a picture file through `image`.
