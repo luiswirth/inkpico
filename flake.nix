@@ -36,7 +36,7 @@
       pico-sdk = pkgs.pico-sdk.override {withSubmodules = true;};
     in {
       default = pkgs.mkShell {
-        packages = with pkgs; [cmake ninja gcc-arm-embedded picotool python3 just tio imagemagick];
+        packages = with pkgs; [cmake ninja gcc-arm-embedded picotool python3 just tio typst imagemagick];
         PICO_SDK_PATH = "${pico-sdk}/lib/pico-sdk";
         # Point it at a checkout, such as ../pico-ota, to work on both at once.
         PICO_OTA_PATH = "${pico-ota}";

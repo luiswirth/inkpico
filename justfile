@@ -8,13 +8,9 @@ build:
 flash app: build
     "$PICO_OTA_PATH/tools/ota" flash {{ host }} build/{{ app }}.bin
 
-# Shows a picture file of any format on the image app: fitted to the panel,
-# dithered to black and white, and stripped of its PBM header.
-show file:
-    magick {{ quote(file) }} -resize 648x480 -background white -gravity center \
-        -extent 648x480 -monochrome pbm:- | tail -c 38880 | \
-        curl -sS --fail-with-body -X PUT -H 'Content-Type: application/octet-stream' \
-        --data-binary @- http://{{ host }}/image
+# Shows a Typst document or a picture on the image app; see tools/show.
+show file *flags:
+    tools/show {{ flags }} {{ quote(file) }} {{ host }}
 
 # The program's printf output; tio reconnects across reflashes.
 monitor:

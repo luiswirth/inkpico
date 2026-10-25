@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Shows a file on the image app, through Typst: a Typst document, or a
+# picture Typst takes (SVG, PNG, JPEG, GIF), fitted to the screen.
+#   show [--dither] <file> <host>       sends it to the Pico
+#   show [--dither] <file> <out.png>    writes the 1-bit picture there instead
+# The page is the panel, 648x480 pt at one pixel per point, white, without
+# margins; a document may set its own. Gray becomes black or white at 50%,
+# or is dithered, which suits photos.
+set -euo pipefail
+
+die() { echo "show: $*" >&2; exit 1; }
+
+dither=false
+[[ ${1:-} == --dither ]] && { dither=true; shift; }
+[[ $# == 2 ]] || die "usage: show [--dither] <file> <host|out.png>"
+file=$(realpath "$1") to=$2
+[[ -f $file ]] || die "no file $1"
+
+tmp=$(mktemp -d)
+trap 'rm -r "$tmp"' EXIT
+{
+    echo '#set page(width: 648pt, height: 480pt, margin: 0pt, fill: white)'
+    if [[ $file == *.typ ]]; then
+        echo "#include \"$file\""
+    else
+        echo "#image(\"$file\", width: 100%, height: 100%, fit: \"contain\")"
+    fi
+} >"$tmp/page.typ"
+typst compile --root / --format png --ppi 72 --pages 1 "$tmp/page.typ" "$tmp/page.png"
+
+# -monochrome would lose mid grays; the remap dithers to black and white only.
+if $dither; then mono=(-dither FloydSteinberg -remap pattern:gray50); else mono=(-threshold 50%); fi
+magick "$tmp/page.png" -background white -alpha remove -colorspace gray "${mono[@]}" "$tmp/page.pbm"
+
+if [[ $to == *.png ]]; then
+    magick "$tmp/page.pbm" "$to"
+else
+    tail -c 38880 "$tmp/page.pbm" >"$tmp/image.bin"
+    curl -sS --fail-with-body -m 30 -X PUT -H 'Content-Type: application/octet-stream' \
+        --data-binary @"$tmp/image.bin" "http://$to/image"
+fi
