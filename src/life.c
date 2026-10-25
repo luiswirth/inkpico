@@ -10,7 +10,7 @@ static epd_image image1;
 static epd_image image2;
 
 static bool draw_to2 = true;
-// Fixed poin with 24 fractional bits: the RP2040 has no FPU.
+// Fixed point with 24 fractional bits: the RP2040 has no FPU.
 #define FIX(x) ((int32_t)((x) * (1 << 24)))
 
 typedef bool (*update_cell)(uint8_t, bool);
@@ -38,8 +38,8 @@ static void update_all(update_cell func) {
     draw_to = image1;
     last_frame = image2;
   }
-  for (int y = 0; y < EPD_WIDTH; y++) {
-    for (int x = 0; x < EPD_HEIGHT; x++) {
+  for (int y = 0; y < EPD_HEIGHT; y++) {
+    for (int x = 0; x < EPD_WIDTH; x++) {
       uint8_t neighbors = 0;
       neighbors |= epd_pixel_get(last_frame, x - 1, y - 1) << 0;
       neighbors |= epd_pixel_get(last_frame, x + 0, y - 1) << 1;
@@ -54,6 +54,7 @@ static void update_all(update_cell func) {
     }
   }
   epd_show(draw_to);
+  draw_to2 = !draw_to2;
 }
 
 static void draw_mandelbrot(void) {
@@ -94,11 +95,5 @@ int main(void) {
 
   while (true) {
     update_all(update_conway);
-  }
-
-  // Blink as a sign of life.
-  for (bool on = false;; on = !on) {
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-    sleep_ms(250);
   }
 }
