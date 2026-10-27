@@ -46,6 +46,14 @@ if [[ $to == *.png ]]; then
     magick "$tmp/page.pbm" "$to"
 else
     tail -c 38880 "$tmp/page.pbm" >"$tmp/image.bin"
-    curl -sS --fail-with-body -m 30 -X PUT -H 'Content-Type: application/octet-stream' \
-        --data-binary @"$tmp/image.bin" "http://$to/image"
+    # The Pico's first connect after a while idle often fails (curl exit 7),
+    # and a later one works; anything else, such as an unknown host, fails at once.
+    for try in 1 2 3; do
+        status=0
+        curl -sS --fail-with-body -m 30 -X PUT -H 'Content-Type: application/octet-stream' \
+            --data-binary @"$tmp/image.bin" "http://$to/image" || status=$?
+        [[ $status == 7 && $try != 3 ]] || exit $status
+        echo "show: retrying in 30 s" >&2
+        sleep 30
+    done
 fi
