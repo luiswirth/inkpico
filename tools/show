@@ -47,12 +47,13 @@ if [[ $to == *.png ]]; then
 else
     tail -c 38880 "$tmp/page.pbm" >"$tmp/image.bin"
     # The Pico's first connect after a while idle often fails (curl exit 7),
-    # and a later one works; anything else, such as an unknown host, fails at once.
+    # and its mDNS name sometimes fails to resolve (exit 6), and a later try works;
+    # anything else fails at once.
     for try in 1 2 3; do
         status=0
         curl -sS --fail-with-body -m 30 -X PUT -H 'Content-Type: application/octet-stream' \
             --data-binary @"$tmp/image.bin" "http://$to/image" || status=$?
-        [[ $status == 7 && $try != 3 ]] || exit $status
+        [[ ($status == 6 || $status == 7) && $try != 3 ]] || exit $status
         echo "show: retrying in 30 s" >&2
         sleep 30
     done
