@@ -9,4 +9,5 @@ C firmware for a Raspberry Pi Pico W (RP2040) driving a Waveshare 5.83" e-paper 
 - `pico-ota` is a flake input, as `PICO_OTA_PATH` in the dev shell; pointing it at `../pico-ota` builds against that checkout.
 - `tools/show` renders an HTML page, a Typst document or a picture file at the panel's size, in black and white, and sends it to `image`, or writes the preview instead.
   Only solid black and white survive, so a picture is checked in its preview before it is sent.
+  Strokes under 2px and light text under 11px break up in the threshold.
 - The `justfile` builds, flashes an app over Wi-Fi, and wraps `tools/show`.
